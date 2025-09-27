@@ -3,3 +3,11 @@
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
+
+input:-internal-autofill-selected {
+    appearance: none !important;
+    background-image: none !important;
+    background-color: light-dark(rgba(232, 240, 254, 0), rgba(70, 90, 126, 0)) !important;
+    color: fieldtext !important;
+    border-radius: 2rem !important; /* Equivale a rounded-4xl de Tailwind */
+}
