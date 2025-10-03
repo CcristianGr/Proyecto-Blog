@@ -1,18 +1,16 @@
 import './App.css';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import {LoginPage} from './Pages/Login';
 import {RegisterPage} from './Pages/Register';
-import Home from './Pages/Home';
-
+import { Home } from './Pages/Home';
+// Esto no se toca ome
 function App() {
   return (
-    <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/home" element={<Home />} />
       </Routes>
-    </BrowserRouter>
   );
 }
 

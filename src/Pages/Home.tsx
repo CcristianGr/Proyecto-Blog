@@ -1,7 +1,6 @@
-import React from "react";
 import PostCard, { type Post } from "../Componentes/PostCard";
 
-const Home: React.FC = () => {
+export const Home = () => {
   const posts: Post[] = [
     {
       id: 1,
@@ -38,5 +37,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
  
