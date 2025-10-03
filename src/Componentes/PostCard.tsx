@@ -1,36 +1,42 @@
 import React from "react";
 
-export interface Post {
+export type Post = {
   id: number;
   user: string;
   avatar: string;
   content: string;
   likes: number;
   comments: number;
-}
+};
 
-interface PostCardProps {
+interface Props {
   post: Post;
+  onLike: (id: number) => void;
 }
 
-const PostCard: React.FC<PostCardProps> = ({ post }) => {
+
+const PostCard: React.FC<Props> = ({ post, onLike }) => {
   return (
-    <div className="bg-white shadow-md rounded-xl p-4 mb-4">
-      <div className="flex items-center gap-3 mb-2">
+    <div className="border rounded-lg shadow-md p-4 mb-4 bg-white">
+      <div className="flex items-center mb-2">
         <img
           src={post.avatar}
-          alt="avatar"
-          className="w-10 h-10 rounded-full"
+          alt={post.user}
+          className="w-10 h-10 rounded-full mr-3"
         />
-        <h2 className="font-semibold">{post.user}</h2>
+        <h3 className="font-semibold">{post.user}</h3>
       </div>
-      <p className="text-gray-700">{post.content}</p>
-      <div className="mt-3 flex gap-4 text-sm text-gray-500">
-        <span>👍 {post.likes}</span>
+      <p className="mb-2">{post.content}</p>
+      <div className="text-sm text-gray-500 flex justify-between items-center">
+        <button
+          onClick={() => onLike(post.id)}
+          className="text-blue-500 font-semibold hover:underline"
+        >
+          👍 {post.likes}
+        </button>
         <span>💬 {post.comments}</span>
       </div>
     </div>
   );
 };
-
 export default PostCard;

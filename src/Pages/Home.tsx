@@ -1,7 +1,8 @@
+import React, { useState } from "react";
 import PostCard, { type Post } from "../Componentes/PostCard";
 
-export const Home = () => {
-  const posts: Post[] = [
+export const Home: React.FC = () => {
+  const [posts, setPosts] = useState<Post[]>([
     {
       id: 1,
       user: "Sebastián",
@@ -22,16 +23,24 @@ export const Home = () => {
       id: 3,
       user: "Juan",
       avatar: "https://i.pravatar.cc/150?img=8",
-      content: "Estoy aprendiendo TailwindCSS y es genial 🎨",
+      content: "Estoy aprendiendo TailwindCSS y es genial 💡",
       likes: 9,
       comments: 2,
     },
-  ];
+  ]);
+
+  const handleLike = (id: number) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === id ? { ...post, likes: post.likes + 1 } : post
+      )
+    );
+  };
 
   return (
     <div className="max-w-2xl mx-auto mt-6 px-4">
       {posts.map((post) => (
-        <PostCard key={post.id} post={post} />
+        <PostCard key={post.id} post={post} onLike={handleLike} />
       ))}
     </div>
   );
