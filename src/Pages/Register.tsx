@@ -1,33 +1,103 @@
+import { postRegistrarUsuario } from "../api/EndPoint";
+import type { RegisterForm } from "../TypeScript/Entities";
+import { useNavigate } from 'react-router-dom';
+import { useForm } from '../hooks/useForm';
+import { FormInput } from '../components/FormInput';
+import { SubmitButton } from '../components/SubmitButton';
+import { validateRegisterForm } from '../utils/formValidations';
+
 export const RegisterPage = () => {
-    
+    const navigate = useNavigate();
+
+    const initialValues: RegisterForm = {
+        nombre: "",
+        username: "",
+        correo: "",
+        passwordHash: ""
+    };
+
+    const handleSubmitForm = async (formData: RegisterForm) => {
+        try {
+            await postRegistrarUsuario(formData);
+            console.log('Usuario registrado:', formData);
+            alert("Usuario Registrado");
+            resetForm();
+            navigate('/');
+        } catch (err) {
+            console.error('Error POST:', err);
+            alert("Error al enviar Registrarse. Por favor intenta de nuevo.");
+            throw err; // Re-throw para que useForm maneje el estado de loading
+        }
+    };
+
+    const { values, errors, isLoading, handleChange, handleSubmit, resetForm } = useForm({
+        initialValues,
+        validate: validateRegisterForm,
+        onSubmit: handleSubmitForm
+    });
     return (
         <div>
             <div className="w-full h-[100vh] bg-gray-100 flex justify-center items-center bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500">
-            <form action="" className="h-160 bg-white rounded-4xl">
-                <div className="h-full w-140 grid grid-rows-[20%_21%_20%_15%_20%] place-items-center p-10">
-                    <div className="text-3xl justify-self-center place-self-end">
-                        <p>
-                            <strong>
-                                Registrate
-                            </strong>
-                        </p>
-                    </div>
+                <form onSubmit={handleSubmit} className="h-160 bg-white rounded-4xl">
+                    <div className="h-full w-140 grid grid-rows-[14%_14%_14%_14%_14%_14%_14%] place-items-center p-10">
+                        <div className="text-3xl justify-self-center place-self-end">
+                            <p>
+                                <strong>
+                                    Registrate
+                                </strong>
+                            </p>
+                        </div>
 
-                    <div className="rounded-4xl bg-[#e5dddd] h-14 w-[80%] my-2 justify-self-center place-self-end">
-                        <input type="email" placeholder="Email" className="px-10 w-full h-full outline-0" />
-                    </div>
+                        <FormInput
+                            type="text"
+                            placeholder="Nombre"
+                            value={values.nombre}
+                            onChange={(value) => handleChange('nombre', value)}
+                            hasError={!!errors.nombre}
+                            required
+                            className="place-self-end"
+                        />
 
-                    <div className="rounded-4xl bg-[#e5dddd] h-14 w-[80%] my-2 justify-self-center place-self-start">
-                        <input type="password" placeholder="Contraseña" className="px-10 w-full h-full outline-0" />
-                    </div>
+                        <FormInput
+                            type="text"
+                            placeholder="Usuario"
+                            value={values.username}
+                            onChange={(value) => handleChange('username', value)}
+                            hasError={!!errors.username}
+                            required
+                            className="place-self-end"
+                        />
 
-                    <div className="rounded-4xl bg-green-500 h-14 w-[80%] my-3 justify-self-center place-self-start">
-                        <button className="px-10 w-full h-full text-white font-bold text-xl">Registrarse</button>
+                        <FormInput
+                            type="email"
+                            placeholder="Email"
+                            value={values.correo}
+                            onChange={(value) => handleChange('correo', value)}
+                            hasError={!!errors.correo}
+                            required
+                            className="place-self-end"
+                        />
+
+                        <FormInput
+                            type="password"
+                            placeholder="Contraseña"
+                            value={values.passwordHash}
+                            onChange={(value) => handleChange('passwordHash', value)}
+                            hasError={!!errors.passwordHash}
+                            required
+                            className="place-self-start"
+                        />
+
+                        <SubmitButton
+                            isLoading={isLoading}
+                            loadingText="Registrando..."
+                            defaultText="Registrarse"
+                        />
+                        
+                        <span className="text-gray-400 justify-self-center place-self-start">O puedes <a href="/"><strong>Iniciar Sesion</strong></a> </span>
                     </div>
-                    <span className="text-gray-400 justify-self-center place-self-start">O puedes <a href="/"><strong>Iniciar Sesion</strong></a> </span>
-                </div>
-            </form>
-        </div>
+                </form>
+            </div>
         </div>
     )
 }
