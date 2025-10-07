@@ -34,8 +34,8 @@ export const LoginPage = () => {
 
     return (
         <div className="w-full h-[100vh] bg-gray-100 flex justify-center items-center bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500">
-            <form onSubmit={handleSubmit} className="h-160 bg-white rounded-4xl">
-                <div className="h-full w-140 grid grid-rows-[15%_21%_15%_15%_10%_24%] place-items-center p-10">
+            <form onSubmit={handleSubmit} className="h-130 bg-white rounded-4xl">
+                <div className="h-full w-110 grid grid-rows-[15%_21%_15%_20%_24%] place-items-center p-10">
                     <div className="text-3xl justify-self-center place-self-end">
                         <p>
                             <strong>
@@ -70,7 +70,6 @@ export const LoginPage = () => {
                         defaultText="Ingresar"
                     />
 
-                    <span className="text-gray-400 justify-self-center place-self-start">Olvidaste tu <a href="/"><strong>Usuario / Contraseña</strong></a></span>
                     <span className="justify-self-center place-self-end">
                         <a href="/Register" className="text-gray-400"><strong>Crea tu cuenta</strong></a>
                     </span>

@@ -19,7 +19,6 @@ export const RegisterPage = () => {
     const handleSubmitForm = async (formData: RegisterForm) => {
         try {
             await postRegistrarUsuario(formData);
-            console.log('Usuario registrado:', formData);
             alert("Usuario Registrado");
             resetForm();
             navigate('/');
@@ -38,8 +37,8 @@ export const RegisterPage = () => {
     return (
         <div>
             <div className="w-full h-[100vh] bg-gray-100 flex justify-center items-center bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500">
-                <form onSubmit={handleSubmit} className="h-160 bg-white rounded-4xl">
-                    <div className="h-full w-140 grid grid-rows-[14%_14%_14%_14%_14%_14%_14%] place-items-center p-10">
+                <form onSubmit={handleSubmit} className="h-140 bg-white rounded-4xl">
+                    <div className="h-full w-120 grid grid-rows-[12%_18%_14%_14%_14%_14%_14%] place-items-center p-10">
                         <div className="text-3xl justify-self-center place-self-end">
                             <p>
                                 <strong>
