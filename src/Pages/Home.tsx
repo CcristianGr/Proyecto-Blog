@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import Navbar from "../Componentes/Navbar";
-import PostCard, { type Post } from "../Componentes/PostCard";
+import Navbar from "../components/Navbar";
+import PostCard, { type Post } from "../components/PostCard";
 
 /* ===== Helpers ===== */
 const STORAGE_KEY = "user_posts_v3";

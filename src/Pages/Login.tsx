@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import type { LoginForm } from "../TypeScript/Entities";
 import { useForm } from '../hooks/useForm';
-import { FormInput } from '../components/FormInput';
-import { SubmitButton } from '../components/SubmitButton';
+import { FormInput } from '../components/Login/FormInput';
+import { SubmitButton } from '../components/Login/SubmitButton';
 import { validateLoginForm } from '../utils/formValidations';
 import { postIniciarSesion } from "../api/EndPoint";
 

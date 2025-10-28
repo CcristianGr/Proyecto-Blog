@@ -2,8 +2,8 @@ import { postRegistrarUsuario } from "../api/EndPoint";
 import type { RegisterForm } from "../TypeScript/Entities";
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '../hooks/useForm';
-import { FormInput } from '../components/FormInput';
-import { SubmitButton } from '../components/SubmitButton';
+import { FormInput } from '../components/Login/FormInput';
+import { SubmitButton } from '../components/Login/SubmitButton';
 import { validateRegisterForm } from '../utils/formValidations';
 
 export const RegisterPage = () => {
