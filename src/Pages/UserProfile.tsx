@@ -2,8 +2,8 @@ export const UserProfile = () => {
 
 
     return (
-        <div className="grid grid-cols-2 grid-rows-2">
-            <div>1
+        <div className="grid grid-cols-2 grid-rows-2 p-20 gap-5 *:border-2">
+            <div className="flex flex-col">
                 <div>
                     <img src="" alt="" />
                 </div>
@@ -31,7 +31,6 @@ export const UserProfile = () => {
                     <button>Edit</button>
                 </div>
             </div>
-            <div>3</div>
             <div>4
                 <div>
                     <p>Post Realizados</p>
