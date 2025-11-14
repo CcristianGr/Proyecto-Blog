@@ -1,6 +1,5 @@
 import { AnimateOnVisible } from "./AnimateOnVisible";
 import { DEFAULT_COVER, estimateReadingMins } from "../utils/postUtils";
-import type { Post } from "../TypeScript/Entities";
 
 interface PostFormProps {
   isOpen: boolean;
@@ -13,7 +12,7 @@ interface PostFormProps {
     isDraft: boolean;
   };
   error: string | null;
-  dropRef: React.RefObject<HTMLDivElement>;
+  dropRef: React.RefObject<HTMLDivElement | null>;
   onTitleChange: (title: string) => void;
   onCoverUrlChange: (url: string) => void;
   onExcerptChange: (excerpt: string) => void;
