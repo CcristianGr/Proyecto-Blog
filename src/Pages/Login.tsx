@@ -4,7 +4,6 @@ import { useForm } from '../hooks/useForm';
 import { FormInput } from '../components/Login/FormInput';
 import { SubmitButton } from '../components/Login/SubmitButton';
 import { validateLoginForm } from '../utils/formValidations';
-import { postIniciarSesion } from "../api/EndPoint";
 import { saveAuthToken, saveUserId } from "../utils/authUtils";
 
 export const LoginPage = () => {

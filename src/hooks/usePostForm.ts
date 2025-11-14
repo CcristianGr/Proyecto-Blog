@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { Post } from "../TypeScript/Entities";
 import { isValidImageUrl } from "../utils/postUtils";
-import { DEFAULT_COVER } from "../utils/postUtils";
 
 interface PostFormData {
   title: string;
@@ -21,7 +20,7 @@ interface UsePostFormReturn {
   formData: PostFormData;
   error: string | null;
   isEditing: boolean;
-  dropRef: React.RefObject<HTMLDivElement>;
+  dropRef: React.RefObject<HTMLDivElement | null>;
   setTitle: (title: string) => void;
   setCoverUrl: (url: string) => void;
   setExcerpt: (excerpt: string) => void;
