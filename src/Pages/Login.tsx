@@ -5,6 +5,7 @@ import { FormInput } from '../components/Login/FormInput';
 import { SubmitButton } from '../components/Login/SubmitButton';
 import { validateLoginForm } from '../utils/formValidations';
 import { postIniciarSesion } from "../api/EndPoint";
+import { saveAuthToken, saveUserId } from "../utils/authUtils";
 
 export const LoginPage = () => {
     const navigate = useNavigate();
@@ -16,12 +17,66 @@ export const LoginPage = () => {
 
     const handleSubmitForm = async (formData: LoginForm) => {
         try {
-            await postIniciarSesion(formData);
+            // Usar axios directamente para poder acceder a los headers
+            const axios = (await import("axios")).default;
+            const API_BASE_URL = import.meta.env.VITE_API_BLOG;
+            
+            const response = await axios.post(`${API_BASE_URL}/api/Acceso/Login`, formData);
+            
+            // La API puede devolver el token de diferentes formas:
+            // 1. En el body como string: response.data = "token123"
+            // 2. En el body como objeto: response.data = { token: "token123", userId: 1 }
+            // 3. En headers: response.headers['authorization'] o response.headers['x-auth-token']
+            
+            let token: string | null = null;
+            let userId: number | null = null;
+
+            // Buscar token en headers primero (más común en APIs REST)
+            const authHeader = response.headers['authorization'] || 
+                              response.headers['Authorization'] ||
+                              response.headers['x-auth-token'] ||
+                              response.headers['X-Auth-Token'];
+            
+            if (authHeader) {
+                // Si viene como "Bearer token", extraer solo el token
+                token = authHeader.startsWith('Bearer ') 
+                    ? authHeader.substring(7) 
+                    : authHeader;
+            }
+
+            // Si no está en headers, buscar en el body
+            if (!token) {
+                const data = response.data;
+                if (typeof data === "string") {
+                    // Si la respuesta es un string, asumimos que es el token
+                    token = data;
+                } else if (data && typeof data === "object") {
+                    // Si es un objeto, buscar token y userId en diferentes propiedades posibles
+                    token = data.token || data.accessToken || data.jwt || data.Token || null;
+                    userId = data.userId || data.idUsuario || data.id || data.IdUsuario || null;
+                }
+            }
+
+            // Guardar token si existe
+            if (token) {
+                saveAuthToken(token);
+            } else {
+                console.warn("No se recibió token en la respuesta del login. Revisa el formato de respuesta de la API.");
+            }
+
+            // Guardar userId si existe
+            if (userId && typeof userId === "number") {
+                saveUserId(userId);
+            }
+
             alert("Login exitoso");
-            navigate('/Home');
-        } catch (err) {
+            navigate('/home');
+        } catch (err: any) {
             console.error('Error en login:', err);
-            alert("Error al iniciar sesión. Por favor intenta de nuevo.");
+            const errorMessage = err.response?.data?.message || 
+                                err.response?.data?.error ||
+                                "Error al iniciar sesión. Por favor intenta de nuevo.";
+            alert(errorMessage);
             throw err;
         }
     };
