@@ -68,14 +68,12 @@ export const LoginPage = () => {
                 saveUserId(userId);
             }
 
-            alert("Login exitoso");
             navigate('/home');
         } catch (err: any) {
             console.error('Error en login:', err);
             const errorMessage = err.response?.data?.message || 
                                 err.response?.data?.error ||
                                 "Error al iniciar sesión. Por favor intenta de nuevo.";
-            alert(errorMessage);
             throw err;
         }
     };
