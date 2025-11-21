@@ -102,6 +102,11 @@ export const Home: React.FC = () => {
             };
             await updatePost(postId, newPost);
             alert("Artículo actualizado ✔");
+            
+            clearForm();
+            setFormOpen(false);
+            setEditingPost(null);
+            document.getElementById("articulos")?.scrollIntoView({ behavior: "smooth" });
           } else {
             throw new Error("ID de post inválido para actualizar en API");
           }
@@ -130,29 +135,49 @@ export const Home: React.FC = () => {
           
           await createPost(formDataToSend);
           alert(data.isDraft ? "Borrador guardado ✔" : "Artículo publicado ✔");
-        }
-
-        clearForm();
-        setFormOpen(false);
-        setEditingPost(null);
-        document.getElementById("articulos")?.scrollIntoView({ behavior: "smooth" });
-      } catch (err) {
-        // Fallback: si falla la API, guarda en localStorage
-        if (isEditing && editingPost) {
-          const updatedPost: Post = {
-            ...editingPost,
-            ...newPost,
-            id: editingPost.id,
-          };
-          const currentPosts = JSON.parse(localStorage.getItem("user_posts_v3") || "[]");
-          const updatedPosts = currentPosts.map((p: Post) =>
-            p.id === editingPost.id ? updatedPost : p
-          );
-          localStorage.setItem("user_posts_v3", JSON.stringify(updatedPosts));
-          alert("Artículo actualizado ✔ (guardado localmente)");
+          
           clearForm();
           setFormOpen(false);
           setEditingPost(null);
+          document.getElementById("articulos")?.scrollIntoView({ behavior: "smooth" });
+        }
+      } catch (err) {
+        // Fallback: si falla la API, guarda en localStorage solo para edición
+        if (isEditing && editingPost) {
+          try {
+            const fallbackPost: Omit<Post, "id"> = {
+              title: data.title.trim(),
+              coverUrl: data.coverUrl.trim() || DEFAULT_COVER,
+              excerpt: data.excerpt.trim(),
+              contenido: data.excerpt.trim(),
+              author: "Tú",
+              date: now.toISOString(),
+              tags: tagList,
+              initialLikes: editingPost?.initialLikes ?? 0,
+              href: generatePostHref(data.title),
+              readingMins: estimateReadingMins(data.excerpt),
+              draft: data.isDraft,
+              idUsuario: userId,
+              idCategoria: data.categoryId,
+            };
+            const updatedPost: Post = {
+              ...editingPost,
+              ...fallbackPost,
+              id: editingPost.id,
+            };
+            const currentPosts = JSON.parse(localStorage.getItem("user_posts_v3") || "[]");
+            const updatedPosts = currentPosts.map((p: Post) =>
+              p.id === editingPost.id ? updatedPost : p
+            );
+            localStorage.setItem("user_posts_v3", JSON.stringify(updatedPosts));
+            alert("Artículo actualizado ✔ (guardado localmente)");
+            clearForm();
+            setFormOpen(false);
+            setEditingPost(null);
+          } catch (localErr) {
+            console.error("Error saving to localStorage:", localErr);
+            throw err;
+          }
         } else {
           throw err;
         }
@@ -303,42 +328,58 @@ export const Home: React.FC = () => {
         </div>
 
         {/* Estados de carga: loading, error o sin resultados */}
-        {isLoading ? (
-          <div style={{ textAlign: "center", padding: "40px", color: "var(--muted)" }}>
-            Cargando publicaciones...
-          </div>
-        ) : postsError ? (
-          <div style={{ textAlign: "center", padding: "40px", color: "var(--muted)" }}>
-            <p style={{ marginBottom: "12px", color: "#b91c1c" }}>{postsError}</p>
-            <p style={{ fontSize: "14px" }}>
-              No se pudieron cargar las publicaciones. Por favor, intenta recargar la página.
-            </p>
-          </div>
-        ) : filteredPosts.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--muted)" }}>
-            <p style={{ fontSize: "18px", marginBottom: "12px", color: "var(--text)" }}>
-              {hasActiveFilters 
-                ? "No se encontraron publicaciones con los filtros seleccionados" 
-                : "No hay publicaciones disponibles"}
-            </p>
-            {hasActiveFilters ? (
-              <button className="btn btn--primary" onClick={clearFilters}>
-                Limpiar filtros
-              </button>
-            ) : (
-              <p style={{ fontSize: "14px" }}>
-                Sé el primero en crear una publicación
-              </p>
-            )}
-          </div>
-        ) : (
-          <PostGrid
-            posts={filteredPosts}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onPublish={handlePublish}
-          />
-        )}
+        {(() => {
+          if (isLoading) {
+            return (
+              <div style={{ textAlign: "center", padding: "40px", color: "var(--muted)" }}>
+                Cargando publicaciones...
+              </div>
+            );
+          }
+          
+          if (postsError) {
+            return (
+              <div style={{ textAlign: "center", padding: "40px", color: "var(--muted)" }}>
+                <p style={{ marginBottom: "12px", color: "#b91c1c" }}>{postsError}</p>
+                <p style={{ fontSize: "14px" }}>
+                  No se pudieron cargar las publicaciones. Por favor, intenta recargar la página.
+                </p>
+              </div>
+            );
+          }
+          
+          if (filteredPosts.length === 0) {
+            const emptyMessage = hasActiveFilters 
+              ? "No se encontraron publicaciones con los filtros seleccionados" 
+              : "No hay publicaciones disponibles";
+            
+            return (
+              <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--muted)" }}>
+                <p style={{ fontSize: "18px", marginBottom: "12px", color: "var(--text)" }}>
+                  {emptyMessage}
+                </p>
+                {hasActiveFilters ? (
+                  <button className="btn btn--primary" onClick={clearFilters}>
+                    Limpiar filtros
+                  </button>
+                ) : (
+                  <p style={{ fontSize: "14px" }}>
+                    Sé el primero en crear una publicación
+                  </p>
+                )}
+              </div>
+            );
+          }
+          
+          return (
+            <PostGrid
+              posts={filteredPosts}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onPublish={handlePublish}
+            />
+          );
+        })()}
       </section>
 
       {/* Sección de suscripción/newsletter */}

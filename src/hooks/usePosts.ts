@@ -8,7 +8,7 @@ import {
   deleteEliminarPublicacion
 } from "../api/EndPoint";
 import { loadUserPosts, saveUserPosts } from "../utils/localStorageUtils";
-import { mapPublicacionDTOToPost } from "../utils/postMappers";
+import { mapPublicacionDTOToPost, mapPostToPublicacionDTO } from "../utils/postMappers";
 
 interface UsePostsOptions {
   userId?: number;

@@ -19,12 +19,10 @@ export const RegisterPage = () => {
     const handleSubmitForm = async (formData: RegisterForm) => {
         try {
             await postRegistrarUsuario(formData);
-            alert("Usuario Registrado");
             resetForm();
             navigate('/');
         } catch (err) {
             console.error('Error POST:', err);
-            alert("Error al enviar Registrarse. Por favor intenta de nuevo.");
             throw err; // Re-throw para que useForm maneje el estado de loading
         }
     };
