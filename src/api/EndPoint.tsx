@@ -47,6 +47,7 @@ export async function getMisPublicaciones() {
 
 // Crea una nueva publicación
 export async function postCrearPublicacion(data: PublicacionDTO) {
+  console.log("Data que llega al metodo crear",data)
   const response = await apiClient.post(`/api/Publicaciones/Crear`, data);
   return response.data;
 }

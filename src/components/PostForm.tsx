@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { AnimateOnVisible } from "./AnimateOnVisible";
 import { DEFAULT_COVER, estimateReadingMins } from "../utils/postUtils";
 
@@ -43,8 +44,30 @@ export const PostForm: React.FC<PostFormProps> = ({
 }) => {
   if (!isOpen) return null;
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const wordCount = formData.excerpt.trim().split(/\s+/).filter(Boolean).length;
   const readingMins = estimateReadingMins(formData.excerpt);
+
+  // Maneja la selección de archivo desde el input
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        onCoverUrlChange(String(reader.result));
+      };
+      reader.readAsDataURL(file);
+    }
+    // Limpia el input para permitir seleccionar el mismo archivo nuevamente
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // Abre el selector de archivos al hacer click en el área de drop
+  const handleDropZoneClick = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <AnimateOnVisible>
@@ -75,15 +98,27 @@ export const PostForm: React.FC<PostFormProps> = ({
 
         <div className="row">
           <div className="field">
-            <label htmlFor="cover">Imagen (URL o suéltala debajo)</label>
+            <label htmlFor="cover">Imagen (URL, arrastra o selecciona)</label>
             <input
               id="cover"
               value={formData.coverUrl}
               onChange={(e) => onCoverUrlChange(e.target.value)}
               placeholder="https://..."
             />
-            <div ref={dropRef} className="dz" style={{ marginTop: 8 }}>
-              Arrastra una imagen aquí o pega una URL arriba
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              style={{ display: "none" }}
+            />
+            <div 
+              ref={dropRef} 
+              className="dz" 
+              style={{ marginTop: 8, cursor: "pointer" }}
+              onClick={handleDropZoneClick}
+            >
+              Arrastra una imagen aquí, haz click para seleccionar o pega una URL arriba
             </div>
           </div>
           <div className="field">

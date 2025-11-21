@@ -87,6 +87,7 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
         id: 0,
         idUsuario: userId ?? 0,
       } as Post);
+      console.log(dto)
       await postCrearPublicacion(dto);
       await Promise.all([loadAllPosts(), loadUserPostsFromAPI()]);
     } catch (err) {
