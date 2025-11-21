@@ -63,3 +63,36 @@ export const mapPostToPublicacionDTO = (post: Post): PublicacionDTO => {
     idCategoria: post.idCategoria ?? null,
   };
 };
+
+// Convierte datos del formulario a FormData para enviar multipart/form-data
+export const createPublicacionFormData = (data: {
+  titulo: string;
+  contenido: string;
+  etiqueta: string; // Nota: el servidor espera "etiqueta" (singular)
+  idCategoria: number | null;
+  idUsuario: number;
+  imagen: File | null;
+}): FormData => {
+  const formData = new FormData();
+  
+  // Campos de texto
+  formData.append("titulo", data.titulo);
+  formData.append("contenido", data.contenido);
+  
+  // Etiqueta (singular, como espera el servidor)
+  if (data.etiqueta) {
+    formData.append("etiqueta", data.etiqueta);
+  }
+  
+  // ID de categoría (debe ser un número válido 1-5)
+  if (data.idCategoria !== null && data.idCategoria >= 1 && data.idCategoria <= 5) {
+    formData.append("idCategoria", data.idCategoria.toString());
+  }
+  
+  // Archivo de imagen
+  if (data.imagen) {
+    formData.append("imagen", data.imagen);
+  }
+  
+  return formData;
+};

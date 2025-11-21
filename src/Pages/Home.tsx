@@ -12,6 +12,7 @@ import { usePostFilters } from "../hooks/usePostFilters";
 import { usePostForm } from "../hooks/usePostForm";
 import { homeStyles } from "../styles/homeStyles";
 import { DEFAULT_COVER, generatePostHref, estimateReadingMins } from "../utils/postUtils";
+import { createPublicacionFormData } from "../utils/postMappers";
 import { getUserId as getUserIdFromAuth } from "../utils/authUtils";
 
 // Componente principal de la página Home: muestra y gestiona todas las publicaciones
@@ -65,6 +66,8 @@ export const Home: React.FC = () => {
     setExcerpt,
     setTags,
     setIsDraft,
+    setImageFile,
+    setCategoryId,
     handleSubmit,
     clearForm,
   } = usePostForm({
@@ -76,36 +79,56 @@ export const Home: React.FC = () => {
         .map((s) => s.trim())
         .filter(Boolean);
 
-      // Prepara el nuevo post con todos los campos necesarios
-      const newPost: Omit<Post, "id"> = {
-        title: data.title.trim(),
-        coverUrl: data.coverUrl.trim() || DEFAULT_COVER,
-        excerpt: data.excerpt.trim(),
-        contenido: data.excerpt.trim(),
-        author: "Tú",
-        date: now.toISOString(),
-        tags: tagList,
-        initialLikes: editingPost?.initialLikes ?? 0,
-        href: generatePostHref(data.title),
-        readingMins: estimateReadingMins(data.excerpt),
-        draft: data.isDraft,
-        idUsuario: userId,
-        idCategoria: null,
-      };
-
       try {
-        // Si está editando, actualiza el post existente
+        // Si está editando, actualiza el post existente (usando JSON como antes)
         if (isEditing && editingPost) {
           const postId = typeof editingPost.id === "number" ? editingPost.id : parseInt(String(editingPost.id), 10);
           if (!isNaN(postId)) {
+            // Para editar, mantenemos el formato JSON por ahora
+            const newPost: Omit<Post, "id"> = {
+              title: data.title.trim(),
+              coverUrl: data.coverUrl.trim() || DEFAULT_COVER,
+              excerpt: data.excerpt.trim(),
+              contenido: data.excerpt.trim(),
+              author: "Tú",
+              date: now.toISOString(),
+              tags: tagList,
+              initialLikes: editingPost?.initialLikes ?? 0,
+              href: generatePostHref(data.title),
+              readingMins: estimateReadingMins(data.excerpt),
+              draft: data.isDraft,
+              idUsuario: userId,
+              idCategoria: data.categoryId,
+            };
             await updatePost(postId, newPost);
             alert("Artículo actualizado ✔");
           } else {
             throw new Error("ID de post inválido para actualizar en API");
           }
         } else {
-          // Si no está editando, crea un nuevo post
-          await createPost(newPost);
+          // Si no está editando, crea un nuevo post usando FormData
+          // Validar que haya título, contenido y categoría
+          if (!data.title.trim()) {
+            throw new Error("El título es requerido");
+          }
+          if (!data.excerpt.trim()) {
+            throw new Error("El contenido es requerido");
+          }
+          if (!data.categoryId || data.categoryId < 1 || data.categoryId > 5) {
+            throw new Error("Debes seleccionar una categoría válida (1-5)");
+          }
+          
+          // Crea el FormData con los datos del formulario
+          const formDataToSend = createPublicacionFormData({
+            titulo: data.title.trim(),
+            contenido: data.excerpt.trim(),
+            etiqueta: tagList.join(", "), // Une las etiquetas con comas
+            idCategoria: data.categoryId,
+            idUsuario: userId,
+            imagen: data.imageFile,
+          });
+          
+          await createPost(formDataToSend);
           alert(data.isDraft ? "Borrador guardado ✔" : "Artículo publicado ✔");
         }
 
@@ -235,7 +258,7 @@ export const Home: React.FC = () => {
         </button>
 
         {/* Formulario para crear o editar posts */}
-        <PostForm
+          <PostForm
           isOpen={formOpen}
           isEditing={isEditing}
           formData={formData}
@@ -246,6 +269,8 @@ export const Home: React.FC = () => {
           onExcerptChange={setExcerpt}
           onTagsChange={setTags}
           onIsDraftChange={setIsDraft}
+          onImageFileChange={setImageFile}
+          onCategoryIdChange={setCategoryId}
           onSubmit={handleSubmit}
           onClear={clearForm}
           onCancel={() => {

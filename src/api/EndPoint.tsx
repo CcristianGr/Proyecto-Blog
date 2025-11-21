@@ -45,10 +45,13 @@ export async function getMisPublicaciones() {
   return response.data;
 }
 
-// Crea una nueva publicación
-export async function postCrearPublicacion(data: PublicacionDTO) {
-  console.log("Data que llega al metodo crear",data)
-  const response = await apiClient.post(`/api/Publicaciones/Crear`, data);
+// Crea una nueva publicación usando FormData (multipart/form-data)
+export async function postCrearPublicacion(formData: FormData) {
+  const response = await apiClient.post(`/api/Publicaciones/Crear`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return response.data;
 }
 

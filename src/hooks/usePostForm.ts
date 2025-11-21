@@ -8,6 +8,8 @@ interface PostFormData {
   excerpt: string;
   tags: string;
   isDraft: boolean;
+  imageFile: File | null; // Archivo de imagen seleccionado
+  categoryId: number | null; // ID de categoría (1-5)
 }
 
 interface UsePostFormOptions {
@@ -26,6 +28,8 @@ interface UsePostFormReturn {
   setExcerpt: (excerpt: string) => void;
   setTags: (tags: string) => void;
   setIsDraft: (isDraft: boolean) => void;
+  setImageFile: (file: File | null) => void;
+  setCategoryId: (id: number | null) => void;
   validate: () => string | null;
   handleSubmit: (e: React.FormEvent) => Promise<void>;
   clearForm: () => void;
@@ -42,6 +46,8 @@ export const usePostForm = (options: UsePostFormOptions): UsePostFormReturn => {
     excerpt: "",
     tags: "",
     isDraft: false,
+    imageFile: null,
+    categoryId: null,
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -57,6 +63,8 @@ export const usePostForm = (options: UsePostFormOptions): UsePostFormReturn => {
         excerpt: initialPost.excerpt,
         tags: (initialPost.tags ?? []).join(", "),
         isDraft: !!initialPost.draft,
+        imageFile: null, // No podemos reconstruir el archivo desde una URL
+        categoryId: initialPost.idCategoria ?? null,
       });
     }
   }, [initialPost]);
@@ -82,11 +90,18 @@ export const usePostForm = (options: UsePostFormOptions): UsePostFormReturn => {
       
       const file = e.dataTransfer?.files?.[0];
       if (file && file.type.startsWith("image/")) {
+        // Guarda el archivo File para enviarlo al servidor
+        setFormData(prev => ({
+          ...prev,
+          imageFile: file,
+        }));
+        // También crea una preview con base64 para mostrar
         const reader = new FileReader();
         reader.onload = () => {
           setFormData(prev => ({
             ...prev,
             coverUrl: String(reader.result),
+            imageFile: file, // Asegura que se guarde el File
           }));
         };
         reader.readAsDataURL(file);
@@ -157,6 +172,8 @@ export const usePostForm = (options: UsePostFormOptions): UsePostFormReturn => {
       excerpt: "",
       tags: "",
       isDraft: false,
+      imageFile: null,
+      categoryId: null,
     });
     setError(null);
     if (onCancel) {
@@ -174,6 +191,8 @@ export const usePostForm = (options: UsePostFormOptions): UsePostFormReturn => {
     setExcerpt: (excerpt: string) => setFormData(prev => ({ ...prev, excerpt })),
     setTags: (tags: string) => setFormData(prev => ({ ...prev, tags })),
     setIsDraft: (isDraft: boolean) => setFormData(prev => ({ ...prev, isDraft })),
+    setImageFile: (file: File | null) => setFormData(prev => ({ ...prev, imageFile: file })),
+    setCategoryId: (id: number | null) => setFormData(prev => ({ ...prev, categoryId: id })),
     validate,
     handleSubmit,
     clearForm,

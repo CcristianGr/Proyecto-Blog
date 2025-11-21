@@ -8,7 +8,7 @@ import {
   deleteEliminarPublicacion
 } from "../api/EndPoint";
 import { loadUserPosts, saveUserPosts } from "../utils/localStorageUtils";
-import { mapPublicacionDTOToPost, mapPostToPublicacionDTO } from "../utils/postMappers";
+import { mapPublicacionDTOToPost } from "../utils/postMappers";
 
 interface UsePostsOptions {
   userId?: number;
@@ -19,7 +19,7 @@ interface UsePostsReturn {
   userPosts: Post[];
   isLoading: boolean;
   error: string | null;
-  createPost: (post: Omit<Post, "id">) => Promise<void>;
+  createPost: (formData: FormData) => Promise<void>;
   updatePost: (id: number, post: Partial<Post>) => Promise<void>;
   deletePost: (id: number) => Promise<void>;
   refreshPosts: () => Promise<void>;
@@ -78,24 +78,18 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
     }
   }, [userId]);
 
-  // Crea un nuevo post y recarga todos los posts
-  const createPost = useCallback(async (post: Omit<Post, "id">) => {
+  // Crea un nuevo post y recarga todos los posts usando FormData
+  const createPost = useCallback(async (formData: FormData) => {
     try {
       setError(null);
-      const dto = mapPostToPublicacionDTO({
-        ...post,
-        id: 0,
-        idUsuario: userId ?? 0,
-      } as Post);
-      console.log(dto)
-      await postCrearPublicacion(dto);
+      await postCrearPublicacion(formData);
       await Promise.all([loadAllPosts(), loadUserPostsFromAPI()]);
     } catch (err) {
       console.error("Error creating post:", err);
       setError("Error al crear la publicación");
       throw err;
     }
-  }, [userId, loadAllPosts, loadUserPostsFromAPI]);
+  }, [loadAllPosts, loadUserPostsFromAPI]);
 
   // Actualiza un post existente y recarga todos los posts
   const updatePost = useCallback(async (id: number, post: Partial<Post>) => {

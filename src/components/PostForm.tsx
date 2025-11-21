@@ -11,6 +11,8 @@ interface PostFormProps {
     excerpt: string;
     tags: string;
     isDraft: boolean;
+    imageFile: File | null;
+    categoryId: number | null;
   };
   error: string | null;
   dropRef: React.RefObject<HTMLDivElement | null>;
@@ -19,6 +21,8 @@ interface PostFormProps {
   onExcerptChange: (excerpt: string) => void;
   onTagsChange: (tags: string) => void;
   onIsDraftChange: (isDraft: boolean) => void;
+  onImageFileChange: (file: File | null) => void;
+  onCategoryIdChange: (id: number | null) => void;
   onSubmit: (e: React.FormEvent) => void;
   onClear: () => void;
   onCancel?: () => void;
@@ -38,6 +42,8 @@ export const PostForm: React.FC<PostFormProps> = ({
   onExcerptChange,
   onTagsChange,
   onIsDraftChange,
+  onImageFileChange,
+  onCategoryIdChange,
   onSubmit,
   onClear,
   onCancel,
@@ -52,6 +58,9 @@ export const PostForm: React.FC<PostFormProps> = ({
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith("image/")) {
+      // Guarda el archivo File para enviarlo al servidor
+      onImageFileChange(file);
+      // También crea una preview con base64 para mostrar
       const reader = new FileReader();
       reader.onload = () => {
         onCoverUrlChange(String(reader.result));
@@ -85,6 +94,25 @@ export const PostForm: React.FC<PostFormProps> = ({
               placeholder="Ej: Mi primer post"
             />
           </div>
+          <div className="field">
+            <label htmlFor="category">Categoría (1-5)</label>
+            <select
+              id="category"
+              value={formData.categoryId || ""}
+              onChange={(e) => onCategoryIdChange(e.target.value ? parseInt(e.target.value, 10) : null)}
+              style={{ width: "100%", padding: "8px", borderRadius: "8px", border: "1px solid var(--border)" }}
+            >
+              <option value="">Selecciona una categoría</option>
+              <option value="1">Categoría 1</option>
+              <option value="2">Categoría 2</option>
+              <option value="3">Categoría 3</option>
+              <option value="4">Categoría 4</option>
+              <option value="5">Categoría 5</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="row">
           <div className="field">
             <label htmlFor="tags">Etiquetas (coma, máx. 5)</label>
             <input
