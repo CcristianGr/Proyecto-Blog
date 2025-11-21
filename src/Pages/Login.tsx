@@ -71,9 +71,6 @@ export const LoginPage = () => {
             navigate('/home');
         } catch (err: any) {
             console.error('Error en login:', err);
-            const errorMessage = err.response?.data?.message || 
-                                err.response?.data?.error ||
-                                "Error al iniciar sesión. Por favor intenta de nuevo.";
             throw err;
         }
     };
